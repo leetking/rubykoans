@@ -15,10 +15,27 @@ require File.expand_path(File.dirname(__FILE__) + '/neo')
 class Proxy
   def initialize(target_object)
     @object = target_object
-    # ADD MORE CODE HERE
+    @called_times = Hash.new(0) # Hash 保持插入key的先后顺序
   end
 
-  # WRITE CODE HERE
+  def called?(method_name)
+    @called_times.keys.include?(method_name.to_sym)
+  end
+
+  def number_of_times_called(method_name)
+    @called_times[method_name]
+  end
+
+  def messages
+    @called_times.keys
+  end
+
+  private
+  def method_missing(method_name, *args, &p)
+    #puts "call #{method_name} with <#{args.join(', ')}>"
+    @called_times[method_name.to_sym] += 1
+    @object.__send__(method_name, *args, &p)
+  end
 end
 
 # The proxy object should pass the following Koan:
